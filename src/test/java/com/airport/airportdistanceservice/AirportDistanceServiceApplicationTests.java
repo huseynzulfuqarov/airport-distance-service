@@ -1,4 +1,4 @@
-package com.airport.airport_distance_service;
+package com.airport.airportdistanceservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

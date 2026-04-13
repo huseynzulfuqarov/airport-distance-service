@@ -1,4 +1,4 @@
-package com.airport.airport_distance_service;
+package com.airport.airportdistanceservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

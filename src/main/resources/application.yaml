@@ -17,7 +17,8 @@ spring:
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
-    expiration: 86400000 # 24 saat
+    access-token-expiration: 900000        # 15 dəq
+    refresh-token-expiration: 604800000    # 7 gün
 
 airportgap:
   api:

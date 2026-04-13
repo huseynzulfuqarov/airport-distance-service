@@ -1,3 +1,24 @@
 spring:
   application:
     name: airport-distance-service
+  datasource:
+    url: jdbc:h2:mem:airportdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ${DB_PASSWORD:}
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    expiration: 86400000 # 24 saat
+
+airportgap:
+  api:
+    base-url: ${AIRPORTGAP_URL}

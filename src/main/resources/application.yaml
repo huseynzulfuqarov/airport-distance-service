@@ -5,7 +5,12 @@ spring:
   threads:
     virtual:
       enabled: true
-      
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   datasource:
     url: jdbc:h2:mem:airportdb
     driver-class-name: org.h2.Driver
@@ -28,3 +33,6 @@ security:
 airportgap:
   api:
     base-url: ${AIRPORTGAP_URL}
+
+cors:
+  allowed-origins: "http://localhost:5173"

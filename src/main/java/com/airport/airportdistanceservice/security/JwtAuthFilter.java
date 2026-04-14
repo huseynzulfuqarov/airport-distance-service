@@ -1,5 +1,6 @@
 package com.airport.airportdistanceservice.security;
 
+import com.airport.airportdistanceservice.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -39,6 +41,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         try {
             jwt = authHeader.substring(7);
+
+            if (tokenBlacklistService.isBlacklisted(jwt)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is invalidated");
+                return;
+            }
 
 
             //null.equals() olmasin deye

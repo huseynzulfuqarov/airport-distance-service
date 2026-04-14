@@ -26,6 +26,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
+  private final TokenBlacklistServiceImpl tokenBlacklistService;
 
   @Override
   public AuthResponse register(RegisterRequest request) {
@@ -74,6 +75,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     throw new RuntimeException("Refresh token expired");
+  }
+
+  @Override
+  public void logout(String authHeader) {
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new IllegalArgumentException("Invalid Authorization header");
+    }
+    String token = authHeader.substring(7);
+    long remainingTime = jwtService.getRemainingExpireTime(token);
+    tokenBlacklistService.addToBlacklist(token, remainingTime);
   }
 
   private UserDetails buildUserDetails(AppUser user) {

@@ -3,6 +3,7 @@ package com.airport.airportdistanceservice.client;
 import com.airport.airportdistanceservice.exception.AirportNotFoundException;
 import com.airport.airportdistanceservice.exception.ExternalServiceException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,6 +15,7 @@ public class AirportGapClient {
 
     private final WebClient webClient;
 
+    @Cacheable(value = "airports", key = "#iataCode")
     public AirportGapAirportResponse getAirportInfo(String iataCode){
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder

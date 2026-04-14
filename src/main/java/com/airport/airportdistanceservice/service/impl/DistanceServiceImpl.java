@@ -7,6 +7,7 @@ import com.airport.airportdistanceservice.dto.airport.DistanceRequest;
 import com.airport.airportdistanceservice.dto.airport.DistanceResponse;
 import com.airport.airportdistanceservice.service.DistanceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +18,7 @@ public class DistanceServiceImpl implements DistanceService {
   private final AirportGapClient airportGapClient;
 
   @Override
+  @Cacheable(value = "distances", key = "#request.origin() + '-' + #request.destination()")
   public DistanceResponse calculateDistance(DistanceRequest request) {
     String origin = request.origin();
     String destination = request.destination();

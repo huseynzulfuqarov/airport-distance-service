@@ -2,6 +2,7 @@ package com.airport.airportdistanceservice.controller;
 
 import com.airport.airportdistanceservice.dto.auth.AuthResponse;
 import com.airport.airportdistanceservice.dto.auth.LoginRequest;
+import com.airport.airportdistanceservice.dto.auth.RefreshTokenRequest;
 import com.airport.airportdistanceservice.dto.auth.RegisterRequest;
 import com.airport.airportdistanceservice.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,12 +32,12 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody String refreshToken) {
-        return ResponseEntity.ok(authenticationService.refreshToken(refreshToken));
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthResponse> logout(HttpServletRequest request) {
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
         authenticationService.logout(request.getHeader("Authorization"));
         return ResponseEntity.ok().build();
     }

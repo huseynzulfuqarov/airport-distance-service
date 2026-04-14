@@ -20,7 +20,6 @@ spring:
     console:
       enabled: true
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
 
@@ -36,3 +35,4 @@ airportgap:
 
 cors:
   allowed-origins: "http://localhost:5173"
+

@@ -2,12 +2,16 @@ package com.airport.airportdistanceservice.service.impl;
 
 import com.airport.airportdistanceservice.dto.auth.AuthResponse;
 import com.airport.airportdistanceservice.dto.auth.LoginRequest;
+import com.airport.airportdistanceservice.dto.auth.RefreshTokenRequest;
 import com.airport.airportdistanceservice.dto.auth.RegisterRequest;
 import com.airport.airportdistanceservice.entity.AppUser;
 import com.airport.airportdistanceservice.enums.Role;
+import com.airport.airportdistanceservice.exception.InvalidTokenException;
 import com.airport.airportdistanceservice.repository.UserRepository;
 import com.airport.airportdistanceservice.security.JwtService;
 import com.airport.airportdistanceservice.service.AuthenticationService;
+import com.airport.airportdistanceservice.service.TokenBlacklistService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,10 +30,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
-  private final TokenBlacklistServiceImpl tokenBlacklistService;
+  private final TokenBlacklistService tokenBlacklistService;
 
   @Override
+  @Transactional
   public AuthResponse register(RegisterRequest request) {
+
+    if (userRepository.findByEmail(request.email()).isPresent()) {
+              throw new IllegalArgumentException("Email is already registered: " + request.email());
+    }
+
     AppUser user = new AppUser();
     user.setFirstName(request.firstName());
     user.setLastName(request.lastName());
@@ -56,12 +66,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  public AuthResponse refreshToken(String refreshToken) {
+  public AuthResponse refreshToken(RefreshTokenRequest request) {
+    final String refreshToken = request.refreshToken();
     final String userEmail = jwtService.extractEmail(refreshToken);
     final String tokenType = jwtService.extractType(refreshToken);
 
     if (userEmail == null || !"REFRESH".equals(tokenType)) {
-      throw new RuntimeException("Invalid refresh token");
+      throw new InvalidTokenException("Invalid refresh token");
     }
 
     AppUser user = userRepository.findByEmail(userEmail)
@@ -74,7 +85,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       return new AuthResponse(accessToken, refreshToken);
     }
 
-    throw new RuntimeException("Refresh token expired");
+    throw new InvalidTokenException("Refresh token expired");
   }
 
   @Override

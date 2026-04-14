@@ -18,10 +18,15 @@ public class DistanceServiceImpl implements DistanceService {
   private final AirportGapClient airportGapClient;
 
   @Override
+  //cache key GYD ve IST secimi ile IST ve GYD ni eyni olaraq qebul etmelidir
   @Cacheable(value = "distances", key = "#request.origin() + '-' + #request.destination()")
   public DistanceResponse calculateDistance(DistanceRequest request) {
     String origin = request.origin();
     String destination = request.destination();
+
+    if (origin.equals(destination)) {
+      throw new IllegalArgumentException("Origin and destination airports must be different");
+    }
 
     AirportGapAirportResponse originResponse = airportGapClient.getAirportInfo(origin);
     AirportGapAirportResponse destinationResponse = airportGapClient.getAirportInfo(destination);

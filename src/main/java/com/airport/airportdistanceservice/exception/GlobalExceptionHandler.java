@@ -2,6 +2,7 @@ package com.airport.airportdistanceservice.exception;
 
 import com.airport.airportdistanceservice.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,7 +14,20 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid Token",
+                ex.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 
     @ExceptionHandler(AirportNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAirportNotFoundException(
@@ -35,14 +49,14 @@ public class GlobalExceptionHandler {
             ExternalServiceException e, HttpServletRequest request) {
 
         ErrorResponse response = new ErrorResponse(
-        HttpStatus.BAD_REQUEST.value(),
+        HttpStatus.BAD_GATEWAY.value(),
         "External service error",
         e.getMessage(),
         LocalDateTime.now(),
         request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -56,14 +70,14 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_GATEWAY.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
                 errorMessage,
                 LocalDateTime.now(),
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -103,7 +117,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.SERVICE_UNAVAILABLE.value(),
                 "Service Unavailable",
-                ex.getMessage(),
+                "External service returned an error",
                 LocalDateTime.now(),
                 request.getRequestURI()
         );
@@ -115,10 +129,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception ex,
                                                          HttpServletRequest request) {
 
+        log.error("Unexpected error at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                ex.getMessage(),
+             "An unexpected error occurred. Please try again later.",
                 LocalDateTime.now(),
                 request.getRequestURI()
         );

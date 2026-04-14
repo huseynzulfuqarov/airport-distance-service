@@ -1,4 +1,4 @@
-package com.airport.airportdistanceservice.dto;
+package com.airport.airportdistanceservice.dto.airport;
 
 public record DistanceResponse(
         AirportInfo origin,

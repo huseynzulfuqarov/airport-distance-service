@@ -37,28 +37,39 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        try {
+            jwt = authHeader.substring(7);
 
-        jwt = authHeader.substring(7);
 
-        userEmail = jwtService.extractEmail(jwt);
-
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            //null.equals() olmasin deye
+            if ("REFRESH".equals(jwtService.extractType(jwt))) {
+                filterChain.doFilter(request, response);
+                return;
             }
+
+
+            userEmail = jwtService.extractEmail(jwt);
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (Exception e) { //jwtService exception atarsa
+            return;
         }
 
         filterChain.doFilter(request, response);

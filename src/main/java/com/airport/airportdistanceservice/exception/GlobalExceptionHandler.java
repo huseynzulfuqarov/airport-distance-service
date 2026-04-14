@@ -12,24 +12,58 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex,
-                                                         HttpServletRequest request) {
+    @ExceptionHandler(AirportNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAirportNotFoundException(
+            AirportNotFoundException e, HttpServletRequest request) {
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                ex.getMessage(),
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Airport Not Found",
+                e.getMessage(),
                 LocalDateTime.now(),
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(errorResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ErrorResponse> handleExternalServiceException(
+            ExternalServiceException e, HttpServletRequest request) {
+
+        ErrorResponse response = new ErrorResponse(
+        HttpStatus.BAD_REQUEST.value(),
+        "External service error",
+        e.getMessage(),
+        LocalDateTime.now(),
+        request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex,
+                                                                   HttpServletRequest request) {
+
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_GATEWAY.value(),
+                "Validation Failed",
+                errorMessage,
+                LocalDateTime.now(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorResponse);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -44,30 +78,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex,
-                                                                   HttpServletRequest request) {
-
-        String errorMessage = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
-                errorMessage,
-                LocalDateTime.now(),
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(WebClientResponseException.class)
@@ -82,8 +93,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(ex.getStatusCode())
-                .body(errorResponse);
+        return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
     }
 
     @ExceptionHandler(WebClientException.class)
@@ -98,7 +108,21 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(errorResponse);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex,
+                                                         HttpServletRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                ex.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

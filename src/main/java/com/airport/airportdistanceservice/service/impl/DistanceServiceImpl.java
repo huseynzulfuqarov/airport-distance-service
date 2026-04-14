@@ -2,9 +2,9 @@ package com.airport.airportdistanceservice.service.impl;
 
 import com.airport.airportdistanceservice.client.AirportGapAirportResponse;
 import com.airport.airportdistanceservice.client.AirportGapClient;
-import com.airport.airportdistanceservice.dto.AirportInfo;
-import com.airport.airportdistanceservice.dto.DistanceRequest;
-import com.airport.airportdistanceservice.dto.DistanceResponse;
+import com.airport.airportdistanceservice.dto.airport.AirportInfo;
+import com.airport.airportdistanceservice.dto.airport.DistanceRequest;
+import com.airport.airportdistanceservice.dto.airport.DistanceResponse;
 import com.airport.airportdistanceservice.service.DistanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,11 @@
 spring:
   application:
     name: airport-distance-service
+
+  threads:
+    virtual:
+      enabled: true
+      
   datasource:
     url: jdbc:h2:mem:airportdb
     driver-class-name: org.h2.Driver

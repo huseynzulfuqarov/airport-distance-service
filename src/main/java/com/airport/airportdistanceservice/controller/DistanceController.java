@@ -1,7 +1,7 @@
 package com.airport.airportdistanceservice.controller;
 
-import com.airport.airportdistanceservice.dto.DistanceRequest;
-import com.airport.airportdistanceservice.dto.DistanceResponse;
+import com.airport.airportdistanceservice.dto.airport.DistanceRequest;
+import com.airport.airportdistanceservice.dto.airport.DistanceResponse;
 import com.airport.airportdistanceservice.service.DistanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

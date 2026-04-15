@@ -11,7 +11,7 @@ import com.airport.airportdistanceservice.repository.UserRepository;
 import com.airport.airportdistanceservice.security.JwtService;
 import com.airport.airportdistanceservice.service.AuthenticationService;
 import com.airport.airportdistanceservice.service.TokenBlacklistService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -66,6 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public AuthResponse refreshToken(RefreshTokenRequest request) {
     final String refreshToken = request.refreshToken();
     final String userEmail = jwtService.extractEmail(refreshToken);

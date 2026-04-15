@@ -15,7 +15,7 @@ public class AirportGapClient {
 
     private final WebClient webClient;
 
-    @Cacheable(value = "airports", key = "#iataCode")
+    @Cacheable(value = "airports", key = "#iataCode", sync = true)
     public AirportGapAirportResponse getAirportInfo(String iataCode){
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder

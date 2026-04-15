@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 public record DistanceRequest(
-        @NotBlank(message = "Origin airport IATA code is required")
-        @Pattern(regexp = "^[A-Z]{3}$", message = "Origin airport IATA code must consist of 3 uppercase letters")
+        @NotBlank(message = "{validation.origin.required}")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "{validation.origin.pattern}")
         String origin,
 
-        @NotBlank(message = "Destination airport IATA code is required")
-        @Pattern(regexp = "^[A-Z]{3}$", message = "Destination airport IATA code must consist of 3 uppercase letters")
+        @NotBlank(message = "{validation.destination.required}")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "{validation.destination.pattern}")
         String destination
 ) {}

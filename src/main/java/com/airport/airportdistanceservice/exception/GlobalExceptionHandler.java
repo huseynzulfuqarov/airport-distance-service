@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getStatusCode().value(),
                 "External Service Error",
-                ex.getResponseBodyAsString(),
+                "External service returned an error",
                 LocalDateTime.now(),
                 request.getRequestURI()
         );

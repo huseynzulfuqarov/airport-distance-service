@@ -20,7 +20,9 @@ public class RedisConfig {
                 .disableCachingNullValues()
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
-                                GenericJacksonJsonRedisSerializer.builder().build()
+                                GenericJacksonJsonRedisSerializer.builder()
+                                        .enableUnsafeDefaultTyping()
+                                        .build()
                         )
                 );
     }

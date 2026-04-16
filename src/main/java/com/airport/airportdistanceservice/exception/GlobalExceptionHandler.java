@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException ex, HttpServletRequest request) {
+        log.warn("Invalid token for request {}: {}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
                 "Invalid Token",
@@ -32,6 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AirportNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAirportNotFoundException(
             AirportNotFoundException e, HttpServletRequest request) {
+        log.warn("Airport not found at {}: {}", request.getRequestURI(), e.getMessage());
 
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
@@ -47,6 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalServiceException.class)
     public ResponseEntity<ErrorResponse> handleExternalServiceException(
             ExternalServiceException e, HttpServletRequest request) {
+        log.error("External service error at {}: {}", request.getRequestURI(), e.getMessage(), e);
 
         ErrorResponse response = new ErrorResponse(
         HttpStatus.BAD_GATEWAY.value(),
@@ -69,6 +72,8 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
+        log.warn("Validation failed at {}: {}", request.getRequestURI(), errorMessage);
+
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
@@ -83,6 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex,
                                                                         HttpServletRequest request) {
+        log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
@@ -98,6 +104,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<ErrorResponse> handleWebClientResponseException(WebClientResponseException ex,
                                                                           HttpServletRequest request) {
+        log.error("WebClient response error at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getStatusCode().value(),
@@ -113,6 +120,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebClientException.class)
     public ResponseEntity<ErrorResponse> handleWebClientException(WebClientException ex,
                                                                   HttpServletRequest request) {
+        log.error("WebClient error at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.SERVICE_UNAVAILABLE.value(),

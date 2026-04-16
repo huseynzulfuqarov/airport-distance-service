@@ -11,6 +11,7 @@ import com.airport.airportdistanceservice.repository.UserRepository;
 import com.airport.airportdistanceservice.security.JwtService;
 import com.airport.airportdistanceservice.service.AuthenticationService;
 import com.airport.airportdistanceservice.service.TokenBlacklistService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -37,6 +39,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   public AuthResponse register(RegisterRequest request) {
 
     if (userRepository.findByEmail(request.email()).isPresent()) {
+      log.warn("User with email {} already exists", request.email());
               throw new IllegalArgumentException("Email is already registered: " + request.email());
     }
 
@@ -48,6 +51,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     user.setRole(Role.USER);
 
     userRepository.save(user);
+
+    log.info("User with email {} registered successfully", request.email());
 
     UserDetails userDetails = buildUserDetails(user);
 
@@ -62,6 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
+    log.info("User {} authenticated successfully", userDetails.getUsername());
     return generateAuthResponse(userDetails);
   }
 
@@ -73,11 +79,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final String tokenType = jwtService.extractType(refreshToken);
 
     if (userEmail == null || !"REFRESH".equals(tokenType)) {
+      log.warn("Invalid refresh token: {}", refreshToken);
       throw new InvalidTokenException("Invalid refresh token");
     }
 
     AppUser user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
 
     UserDetails userDetails = buildUserDetails(user);
 
@@ -86,12 +94,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       return new AuthResponse(accessToken, refreshToken);
     }
 
+    log.warn("Invalid refresh token: {}", refreshToken);
     throw new InvalidTokenException("Refresh token expired");
   }
 
   @Override
   public void logout(String authHeader) {
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      log.warn("Invalid auth header: {}", authHeader);
       throw new IllegalArgumentException("Invalid Authorization header");
     }
     String token = authHeader.substring(7);

@@ -3,12 +3,14 @@ package com.airport.airportdistanceservice.client;
 import com.airport.airportdistanceservice.exception.AirportNotFoundException;
 import com.airport.airportdistanceservice.exception.ExternalServiceException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AirportGapClient {
@@ -17,6 +19,8 @@ public class AirportGapClient {
 
     @Cacheable(value = "airports", key = "#iataCode", sync = true)
     public AirportGapAirportResponse getAirportInfo(String iataCode){
+
+        log.info("Fetching airport info for IATA code: {}", iataCode);
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/airports/{iataCode}")

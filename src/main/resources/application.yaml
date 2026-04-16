@@ -36,3 +36,14 @@ airportgap:
 cors:
   allowed-origins: "http://localhost:5173"
 
+logging:
+  level:
+    root: INFO
+    com.airport.airportdistanceservice: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%X{traceId:-no-trace}] %-5level %logger{36} - %msg%n"
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+    chat-id: ${TELEGRAM_CHAT_ID}

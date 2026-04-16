@@ -2,11 +2,13 @@ package com.airport.airportdistanceservice.service.impl;
 
 import com.airport.airportdistanceservice.service.TokenBlacklistService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenBlacklistServiceImpl implements TokenBlacklistService {
@@ -17,6 +19,7 @@ public class TokenBlacklistServiceImpl implements TokenBlacklistService {
     @Override
     public void addToBlacklist(String token, long expirationInMilliseconds) {
         String key = BLACKLIST_PREFIX + token;
+        log.info("Token blacklisted, TTL: {}ms", expirationInMilliseconds);
         stringRedisTemplate.opsForValue().set(key, "true", expirationInMilliseconds, TimeUnit.MILLISECONDS);
     }
 

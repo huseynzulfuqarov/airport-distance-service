@@ -78,7 +78,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) { //jwtService exception atarsa
-            log.error(e.getMessage());
+            log.warn("JWT auth failed for {}: {}", request.getRequestURI(), e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
             return;
         }

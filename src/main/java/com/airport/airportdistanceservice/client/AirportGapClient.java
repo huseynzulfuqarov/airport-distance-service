@@ -2,6 +2,8 @@ package com.airport.airportdistanceservice.client;
 
 import com.airport.airportdistanceservice.exception.AirportNotFoundException;
 import com.airport.airportdistanceservice.exception.ExternalServiceException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,8 +19,10 @@ public class AirportGapClient {
 
     private final WebClient webClient;
 
+    @Retry(name = "airportGapApi", fallbackMethod = "getAirportInfoFallback")
+    @CircuitBreaker(name = "airportGapApi", fallbackMethod = "getAirportInfoFallback")
     @Cacheable(value = "airports", key = "#iataCode", sync = true)
-    public AirportGapAirportResponse getAirportInfo(String iataCode){
+    public AirportGapAirportResponse getAirportInfo(String iataCode) {
 
         log.info("Fetching airport info for IATA code: {}", iataCode);
         return webClient.get()
@@ -37,5 +41,11 @@ public class AirportGapClient {
                 // 0 ya da 1 nəticə
                 .bodyToMono(AirportGapAirportResponse.class)
                 .block();
+    }
+
+    private AirportGapAirportResponse getAirportInfoFallback(String iataCode, Throwable t) {
+        log.warn("Circuit breaker fallback for: {}. Reason: {}", iataCode, t.getMessage());
+        throw new ExternalServiceException(
+                "Airport service is temporarily unavailable. Please try again later.", t);
     }
 }

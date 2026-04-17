@@ -47,3 +47,34 @@ telegram:
   bot:
     token: ${TELEGRAM_BOT_TOKEN}
     chat-id: ${TELEGRAM_CHAT_ID}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+        airportGapApi:
+            sliding-window-size: 10
+            failure-rate-threshold: 50
+            wait-duration-in-open-state: 30s
+            permitted-number-of-calls-in-half-open-state: 3
+            minimum-number-of-calls: 5
+            slow-call-duration-threshold: 5s
+            slow-call-rate-threshold: 80
+
+  retry:
+    instances:
+        airportGapApi:
+            max-attempts: 3
+            wait-duration: 1s
+            retry-exceptions:
+              - org.springframework.web.reactive.function.client.WebClientException
+              - com.airport.airportdistanceservice.exception.ExternalServiceException #AirportGapClient gelen 5xx xetalarini bu tipe cevirir deye
+            ignore-exceptions:
+              - com.airport.airportdistanceservice.exception.AirportNotFoundException
+
+  ratelimiter:
+    instances:
+      distanceApi:
+        limit-for-period: 100
+        limit-refresh-period: 1m
+        timeout-duration: 0
+

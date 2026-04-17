@@ -13,13 +13,34 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorResponse> handleTooManyRequests(TooManyRequestsException e,
+                                                               HttpServletRequest request) {
+
+        log.warn("Rate limit exceeded for request {}: {}", request.getRequestURI(), e.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.TOO_MANY_REQUESTS.value(),
+                "Too Many Requests",
+                e.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
+    }
+
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException ex,
+                                                                     HttpServletRequest request) {
+
         log.warn("Invalid token for request {}: {}", request.getRequestURI(), ex.getMessage());
+
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
                 "Invalid Token",
@@ -27,12 +48,14 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 request.getRequestURI()
         );
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(AirportNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleAirportNotFoundException(
-            AirportNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleAirportNotFoundException(AirportNotFoundException e,
+                                                                        HttpServletRequest request) {
+
         log.warn("Airport not found at {}: {}", request.getRequestURI(), e.getMessage());
 
         ErrorResponse response = new ErrorResponse(
@@ -47,16 +70,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExternalServiceException.class)
-    public ResponseEntity<ErrorResponse> handleExternalServiceException(
-            ExternalServiceException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleExternalServiceException(ExternalServiceException e,
+                                                                        HttpServletRequest request) {
+
         log.error("External service error at {}: {}", request.getRequestURI(), e.getMessage(), e);
 
         ErrorResponse response = new ErrorResponse(
-        HttpStatus.BAD_GATEWAY.value(),
-        "External service error",
-        e.getMessage(),
-        LocalDateTime.now(),
-        request.getRequestURI()
+                HttpStatus.BAD_GATEWAY.value(),
+                "External service error",
+                e.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI()
         );
 
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(response);
@@ -88,6 +112,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex,
                                                                         HttpServletRequest request) {
+
         log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
@@ -104,6 +129,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<ErrorResponse> handleWebClientResponseException(WebClientResponseException ex,
                                                                           HttpServletRequest request) {
+
         log.error("WebClient response error at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
@@ -120,6 +146,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebClientException.class)
     public ResponseEntity<ErrorResponse> handleWebClientException(WebClientException ex,
                                                                   HttpServletRequest request) {
+
         log.error("WebClient error at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(

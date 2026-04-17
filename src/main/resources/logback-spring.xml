@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty scope="context" name="telegramBotToken" source="telegram.bot.token"/>
+    <springProperty scope="context" name="telegramChatId" source="telegram.bot.chat-id"/>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <appender name="TELEGRAM" class="com.airport.airportdistanceservice.telegram.TelegramAppender">
+        <botToken>${telegramBotToken}</botToken>
+        <chatId>${telegramChatId}</chatId>
+    </appender>
+
+    <appender name="ASYNC_TELEGRAM" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="TELEGRAM"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_TELEGRAM"/>
+    </root>
+
+    <logger name="com.airport.airportdistanceservice" level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+</configuration>

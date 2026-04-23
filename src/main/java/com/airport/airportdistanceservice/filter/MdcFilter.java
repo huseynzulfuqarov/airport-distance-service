@@ -1,4 +1,4 @@
-package com.airport.airportdistanceservice.config;
+package com.airport.airportdistanceservice.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

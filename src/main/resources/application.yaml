@@ -74,7 +74,10 @@ resilience4j:
   ratelimiter:
     instances:
       distanceApi:
-        limit-for-period: 100
+        limit-for-period: 5
         limit-refresh-period: 1m
         timeout-duration: 0
+
+bucket4j:
+  limit-per-minute: 3
 

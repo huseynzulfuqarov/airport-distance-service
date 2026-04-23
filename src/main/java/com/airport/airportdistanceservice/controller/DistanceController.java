@@ -24,6 +24,6 @@ public class DistanceController {
 
     private ResponseEntity<String> rateLimitFallback(DistanceRequest request, Throwable t) {
 
-        throw new TooManyRequestsException("Too many requests. Please try again later.", t);
+        throw new TooManyRequestsException("Too many requests. Please try again later. ex from resilence4j", t);
     }
 }

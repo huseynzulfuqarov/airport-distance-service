@@ -79,7 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     final String tokenType = jwtService.extractType(refreshToken);
 
     if (userEmail == null || !"REFRESH".equals(tokenType)) {
-      log.warn("Invalid refresh token: {}", refreshToken);
+      log.warn("Invalid refresh token: ...{}", refreshToken.substring(refreshToken.length() - 8));
       throw new InvalidTokenException("Invalid refresh token");
     }
 
@@ -94,7 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       return new AuthResponse(accessToken, refreshToken);
     }
 
-    log.warn("Invalid refresh token: {}", refreshToken);
+    log.warn("Invalid refresh token: ...{}", refreshToken.substring(refreshToken.length() - 8));
     throw new InvalidTokenException("Refresh token expired");
   }
 
